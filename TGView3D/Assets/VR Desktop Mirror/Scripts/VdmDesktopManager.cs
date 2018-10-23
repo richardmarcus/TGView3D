@@ -5,10 +5,12 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
+using UnityEngine.UI;
 
 public class VdmDesktopManager : MonoBehaviour {
 
     public static VdmDesktopManager Instance;
+    public GameObject Desktop;
 
     public static bool ActionInThisFrame = false;
     
@@ -217,33 +219,33 @@ public class VdmDesktopManager : MonoBehaviour {
     // Use this for initialization
     IEnumerator Start () {
 
-        Instance = this;
+           Instance = this;
 
-        ReInit();
+            ReInit();
 
-        GameObject monitorBase = transform.GetChild(0).gameObject;
-        monitorBase.SetActive(false);
+            GameObject monitorBase = transform.GetChild(0).gameObject;
+            monitorBase.SetActive(false);
 
-        int nScreen = DesktopCapturePlugin_GetNDesks();
-        int iScreenIndex = 0;
+            int nScreen = DesktopCapturePlugin_GetNDesks();
+            int iScreenIndex = 0;
 
-        for (int s = 0; s <nScreen; s++)
-        {
-            GameObject monitor = GameObject.Instantiate(monitorBase);
+            for (int s = 0; s <nScreen; s++)
+            {
+                GameObject monitor = GameObject.Instantiate(monitorBase);
 
-            if ((MultiMonitorScreen != 0) && (MultiMonitorScreen != (s+1 )))
-                continue;
+                if ((MultiMonitorScreen != 0) && (MultiMonitorScreen != (s+1 )))
+                    continue;
 
-            monitor.name = "Monitor " + (s+1).ToString();
-            VdmDesktop desk = monitor.AddComponent<VdmDesktop>();
-            desk.Screen = s;
-            desk.ScreenIndex = iScreenIndex;
-            iScreenIndex++;
-            monitor.transform.SetParent(transform);
+                monitor.name = "Monitor " + (s+1).ToString();
+                VdmDesktop desk = monitor.AddComponent<VdmDesktop>();
+                desk.Screen = s;
+                desk.ScreenIndex = iScreenIndex;
+                iScreenIndex++;
+                monitor.transform.SetParent(transform);
 
-            monitor.SetActive(true);
-        }
-
+                monitor.SetActive(true);
+            }
+            
         yield return new WaitForSeconds(1);
 
 #if VDM_SteamVR
@@ -259,7 +261,7 @@ public class VdmDesktopManager : MonoBehaviour {
         SteamVR_Utils.Event.Listen("device_connected", OnDeviceConnected);
 #endif
 
-        HackStart();
+       // HackStart();
 
         if (GetMouseTrailEnabled() == false)
         {
@@ -298,12 +300,12 @@ public class VdmDesktopManager : MonoBehaviour {
             UnityEngine.XR.InputTracking.Recenter();    
         }
 
-       // foreach (VdmDesktop monitor in Monitors)
+        foreach (VdmDesktop monitor in Monitors)
         {
             
-            Monitors[1].HideLine();
+            monitor.HideLine();
 
-            Monitors[1].CheckKeyboardAndMouse();                
+            monitor.CheckKeyboardAndMouse();                
             
 #if VDM_SteamVR
             foreach (SteamVR_TrackedObject controller in Controllers)
@@ -425,7 +427,11 @@ public class VdmDesktopManager : MonoBehaviour {
                 DesktopCapturePlugin_SetTexturePtr(screen, tex.GetNativeTexturePtr());
 
                 winDesk.ReInit(tex, width, height);
+               // this.Desktop.GetComponent<Image>().sprite = Sprite.Create(tex, new Rect(0, 0, width, -height), Vector2.zero);
             }
+
+           
+
         }
       
     }
